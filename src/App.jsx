@@ -36,6 +36,7 @@ function App() {
   ]);
 
   const [error, setError] = useState(null);
+  const [jsonResult, setJsonResult] = useState(null);
 
   const submitHandler = () => {
     let nationalCodeList = [];
@@ -93,6 +94,23 @@ function App() {
     if (permission) {
       console.log("submit---------------------------");
       console.log(formListData);
+      setError(null);
+      let newList = [...formListData];
+      let today = new Date();
+      for (let i = 0; i < newList.length; i++) {
+        let birthday = new Date();
+        birthday.setFullYear(
+          newList[i].birthday.year,
+          Number(newList[i].birthday.month) - 1,
+          newList[i].birthday.day
+        );
+        let diff = Math.floor((today - birthday) / (1000 * 60 * 60 * 24 * 365));
+        newList[i].birthday = birthday;
+        newList[i]["ageCategory"] =
+          diff < 2 ? "Infanc" : diff < 12 ? "Child" : "Adult";
+        setJsonResult(JSON.stringify(newList));
+      }
+      console.log(newList);
     }
   };
 
@@ -118,6 +136,9 @@ function App() {
       </div>
       {error && error.fieldName === "submit" && (
         <div className="text-sm h-[25px] text-red-600 mt-2">{error.text}</div>
+      )}
+      {jsonResult && (
+        <div className="w-full p-5 border mt-10 text-sm">{jsonResult}</div>
       )}
     </div>
   );
